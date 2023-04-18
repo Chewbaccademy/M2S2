@@ -3,8 +3,8 @@ import random as rd
 
 class Mouvement:
     
-    def __init__(self, etat:Etat, probabilite:float=1.0):
-        self.etat = etat
+    def __init__(self, etat_final:Etat, probabilite:float=1.0):
+        self.etat_final = etat_final
         if 0.0 < probabilite <= 1.0:
             self.probabilite = probabilite
         else:
@@ -15,7 +15,7 @@ class Action:
     def __init__(self, nom:str, etat_initial:Etat, mouvements:list[Mouvement], recompense:float|int):
         # filtres
         if sum([mouvement.probabilite for mouvement in mouvements]) != 1:
-            raise ValueError(f"Création de l'action {nom} impossible : la somme des probabilité est != 1")
+            raise ValueError(f"Création de l'action {nom} impossible : la somme des probabilités est != 1 ({sum([mouvement.probabilite for mouvement in mouvements])})")
         
         self.nom = nom
         self.etat_initial = etat_initial
@@ -23,10 +23,10 @@ class Action:
         self.recompense = recompense
         
     def tirer_etat(self):
-        etats = [mouvement.etat for mouvement in self.mouvements]
+        etats = [mouvement.etat_final for mouvement in self.mouvements]
         probabilites = [mouvement.probabilite for mouvement in self.mouvements]
         
         return rd.choices(etats, weights=probabilites)
     
-    def consommer(self) -> tuple(Etat, float):
+    def consommer(self) -> tuple:
         return (self.tirer_etat(), self.recompense)
